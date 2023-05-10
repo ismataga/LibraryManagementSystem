@@ -1,28 +1,29 @@
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Main {
 
+    Book book = new Book();
     Scanner sc = new Scanner(System.in);
     Library librarys = new Library();
 
     Order order = new Order();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws BookNotFounded {
         Main main = new Main();
         main.callMenu();
         ;
     }
 
-    private void callMenu() {
+    private void callMenu() throws BookNotFounded {
         while (true) {
             int option = printCallMenuCommand();
             if (chooseMenuOption(option)) return;
         }
     }
 
-    private boolean chooseMenuOption(int option) {
+    private boolean chooseMenuOption(int option) throws BookNotFounded {
         switch (option) {
             case 0 -> {
                 return true;
@@ -31,6 +32,8 @@ public class Main {
             case 2 -> getBook();
             case 3 -> createOrder();
             case 4 -> getOrder();
+            case 5 -> updateBook();
+            case 6 -> searchByName();
             default -> System.out.println("Invalid option");
         }
         return false;
@@ -43,7 +46,9 @@ public class Main {
                 "1. Add book\n" +
                 "2. Get book\n" +
                 "3. CreateOrder\n" +
-                "4. GetOrder\n");
+                "4. GetOrder\n" +
+                "5. UpdateOrder\n" +
+                "6. searchByName\n");
         int option = inputInt("Enter menu option: ");
         return option;
     }
@@ -59,6 +64,51 @@ public class Main {
         librarys.addBook(book);
     }
 
+    public void updateBook() {
+
+//        String bookName = inputString("Enter book name: ");
+//        String authorName = inputString("Enter author name: ");
+//        Book updateBooks = new Book( bookName, authorName);
+        long id = inputLong("Enter updated book id");
+        for (Book book : librarys.getBooks()) {
+            if (book.getBookId() == id) {
+                String authorName = inputString("Enter author name: ");
+                book.setBookName(authorName);
+                String bookName = inputString("Enter book name: ");
+                book.setBookAuthor(bookName);
+            }
+        }
+    }
+
+    public void searchByName() throws BookNotFounded {
+        String searchName = inputString("Enter book name: ");
+        for (Book books : librarys.getBooks()) {
+            if (books.getBookName() != null) {
+                for (Book book : librarys.getBooks()) {
+                    if (book.getBookName().equals(searchName)) {
+                        System.out.println(book);
+                        return;
+                    }
+                }
+            } else {
+                throw new BookNotFounded("Axtardigniz adda kitab yoxdur");
+            }
+
+//
+//            for (Book book : librarys.getBooks()) {
+//                if (!book.getBookName().equals(searchName)) {
+//                    throw new BookNotFounded("Axtardigniz adda kitab yoxdur");
+//                }else {
+//                    System.out.println(book);
+//                    return;
+//                }
+//            }
+
+
+        }
+
+    }
+
     public void getBook() {
         System.out.println("-----------Books----------");
         List<Book> books = librarys.getBooks();
@@ -70,14 +120,14 @@ public class Main {
     public void createOrder() {
         while (true) {
             int option = printOrderCommand();
-            if(option==1){
+            if (option == 1) {
                 long id = inputLong("Enter book id");
                 for (Book book : order.getBooks()) {
-                    if (book.getBookId() == id){
+                    if (book.getBookId() == id) {
                         System.out.println("This book is rented");
                     }
                 }
-            }else  if (option == 2) {
+            } else if (option == 2) {
                 long id = inputLong("Enter book id");
                 addBooks(id);
             } else {
@@ -124,7 +174,8 @@ public class Main {
         int inputInt = sc.nextInt();
         return inputInt;
     }
-    public void addBooks(long id){
+
+    public void addBooks(long id) {
         for (Book book : librarys.getBooks()) {
             if (book.getBookId() == id) ;
             order.addMeal(book);
